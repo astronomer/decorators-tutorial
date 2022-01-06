@@ -2,16 +2,13 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 
+from datetime import datetime
 import json
 from typing import Dict
 import requests
 import logging
 
 API = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true"
-
-default_args = {
-    'start_date': days_ago(1),
-}
 
 def _extract_bitcoin_price():
     return requests.get(API).json()['bitcoin']
@@ -26,7 +23,7 @@ def _store_data(ti):
     data = ti.xcom_pull(task_ids='process_data', key='processed_data')
     logging.info(f"Store: {data['usd']} with change {data['change']}")
 
-with DAG('classic_python_dag', schedule_interval='@daily', default_args=default_args, catchup=False) as dag:
+with DAG('classic_dag', schedule_interval='@daily', start_date=datetime(2021, 12, 1), catchup=False) as dag:
     
     extract_bitcoin_price = PythonOperator(
         task_id='extract_bitcoin_price',

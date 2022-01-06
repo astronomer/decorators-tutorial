@@ -7,7 +7,7 @@ import logging
 
 API = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true"
 
-@dag(schedule_interval='@daily', default_args = {'start_date': datetime(2021, 12, 1)}, catchup=False)
+@dag(schedule_interval='@daily', start_date=datetime(2021, 12, 1), catchup=False)
 def taskflow():
 
     @task(task_id='extract', retries=2)

@@ -1,7 +1,7 @@
 from airflow.decorators import dag
-from astro import sql as aql
+from astro.sql import transform, append
 from astro.sql.table import Table
-from astro import dataframe as df
+from astro import dataframe
 
 from datetime import datetime, timedelta
 import pandas as pd
@@ -10,20 +10,20 @@ SNOWFLAKE_CONN = "snowflake"
 SCHEMA = "example_schema"
 
 # Start by selecting data from two source tables in Snowflake
-@aql.transform()
+@transform
 def combine_data(center_1: Table, center_2: Table):
     return """SELECT * FROM {center_1}
     UNION SELECT * FROM {center_2}"""
 
 # Clean data using SQL
-@aql.transform()
+@transform
 def clean_data(input_table: Table):
     return '''SELECT * 
     FROM {input_table} WHERE TYPE NOT LIKE 'Guinea Pig'
     '''
 
 # Switch to Pandas for pivoting transformation
-@df
+@dataframe
 def aggregate_data(df: pd.DataFrame):
     adoption_reporting_dataframe = df.pivot_table(index='DATE', 
                                                 values='NAME', 
@@ -52,7 +52,7 @@ def animal_adoptions_etl():
                                     output_table=Table('aggregated_adoptions', conn_id=SNOWFLAKE_CONN))
     
     # Append transformed data to reporting table
-    reporting_data = aql.append(
+    reporting_data = append(
         conn_id=SNOWFLAKE_CONN,
         append_table="aggregated_adoptions",
         columns=["DATE", "CAT", "DOG"],
