@@ -1,7 +1,6 @@
 from datetime import datetime
 import pandas as pd
 
-from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from airflow.providers.snowflake.transfers.s3_to_snowflake import S3ToSnowflakeOperator
