@@ -1,1 +1,1 @@
-astro-projects==0.1.2
+astro-projects==0.5.1
